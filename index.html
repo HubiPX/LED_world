@@ -8,10 +8,13 @@
 </head>
 <body>
     <h1>Kontrola LED</h1>
+
     <button onclick="changeLedState('ON')">Włącz</button>
     <button onclick="changeLedState('OFF')">Wyłącz</button>
 
     <p>Aktualny stan LED: <span id="ledStatus">Nieustawiony</span></p>
+
+    <p>Liczba zwarć: <span id="shortCount">0</span></p>
 
     <script>
         async function changeLedState(state) {
@@ -25,6 +28,13 @@
             const response = await fetch('/get');
             const ledStatus = await response.text();
             document.getElementById('ledStatus').textContent = ledStatus;
+        }, 2000);
+
+        // Sprawdzanie liczby zwarć co 2 sekundy
+        setInterval(async () => {
+            const response = await fetch('/get_count');
+            const shortCount = await response.text();
+            document.getElementById('shortCount').textContent = shortCount;
         }, 2000);
     </script>
 </body>
