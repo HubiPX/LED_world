@@ -22,4 +22,4 @@ def index():
     return open('index.html').read()  # Ładuje stronę HTML
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8080)
+    app.run(host='0.0.0.0', port=8080)  # Gunicorn uruchomi aplikację, więc ta linia jest niekonieczna
