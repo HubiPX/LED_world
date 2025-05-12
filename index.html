@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kontrola LED</title>
+</head>
+<body>
+    <h1>Kontrola LED</h1>
+    <button onclick="changeLedState('ON')">Włącz</button>
+    <button onclick="changeLedState('OFF')">Wyłącz</button>
+
+    <p>Aktualny stan LED: <span id="ledStatus">Nieustawiony</span></p>
+
+    <script>
+        async function changeLedState(state) {
+            const response = await fetch(`/set?led=${state}`);
+            const result = await response.text();
+            document.getElementById('ledStatus').textContent = result;
+        }
+
+        // Sprawdzanie stanu LED co 2 sekundy
+        setInterval(async () => {
+            const response = await fetch('/get');
+            const ledStatus = await response.text();
+            document.getElementById('ledStatus').textContent = ledStatus;
+        }, 2000);
+    </script>
+</body>
+</html>
