@@ -78,18 +78,17 @@
             }
         }
 
-        async function updateStatus() {
-            try {
-                const response = await fetch('/get');
-                const text = await response.text();
-                const [click, state] = text.trim().split(",");
+            async function updateStatus() {
+                try {
+                    const response = await fetch('/get_status');
+                    const state = await response.text();
 
-                const statusText = (state === "open") ? "Otwarta" : "Zamknięta";
-                document.getElementById('statusInfo').textContent = `Stan bramy: ${statusText}`;
-            } catch (error) {
-                console.error("Błąd pobierania stanu:", error);
+                    const statusText = (state === "open") ? "Otwarta" : "Zamknięta";
+                    document.getElementById('statusInfo').textContent = `Stan bramy: ${statusText}`;
+                } catch (error) {
+                    console.error("Błąd pobierania stanu:", error);
+                }
             }
-        }
 
         setInterval(updateStatus, 5000);
         updateStatus(); // od razu po załadowaniu
