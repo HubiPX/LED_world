@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kontrola LED</title>
+    <title>OFFON</title>
     <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACMAAAAeCAYAAACmPacqAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAFwmlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGF
     ja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4gPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iQWRvYmUgWE1QIENvcmUgNS42LWMxNDIgNzkuMTYwOTI0LCAyMDE3LzA3
     LzEzLTAxOjA2OjM5ICAgICAgICAiPiA8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPiA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIiB4bWxuczp4bXA9Imh0dHA6L
@@ -17,37 +17,83 @@
     LWU3NGUtYjk4OS0xYjdjOTljODM4ZWMiIHN0RXZ0OndoZW49IjIwMjUtMDUtMDZUMDg6NDk6NTErMDI6MDAiIHN0RXZ0OnNvZnR3YXJlQWdlbnQ9IkFkb2JlIFBob3Rvc2hvcCBDQyAoV2luZG93cykiIHN0RXZ0OmNoYW5nZWQ9Ii8iLz4gP
     C9yZGY6U2VxPiA8L3htcE1NOkhpc3Rvcnk+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+OTRv3QAAAI1JREFUWIXtl0EOgCAMBBfjH/Rz+rj6ufoKPBgCInttOXQSEuiFSQ
     uHTRDN6MjHlvqaBSsA4NxrRdTDA0CR6UjX/euWBUOZT6esEMVifytn3BnLd/OZwvub6mrPxvupxhQyjJBhhAwjZBghwwgZRsgwQoaRIJpdo0q5W3SidIDJxuSfDhqGMr5Z2zFftzyHUU2u9rdT5wAAAABJRU5ErkJggg==">
+    <style>
+        body {
+            text-align: center;
+            padding: 50px;
+            font-family: Arial, sans-serif;
+            background-color: #474646;
+        }
+        h1 {
+            font-size: 100px;
+            color: black;
+        }
+        #btnK1 {
+            position: relative;
+            width: 600px;
+            height: 300px;
+            margin: 20px;
+            cursor: pointer;
+            border: 10px solid black;
+            border-radius: 20px;
+            overflow: hidden;
+            background-color: red;
+            transition: background-color 0.5s;
+            color: transparent;
+        }
+        #statusInfo {
+            font-size: 48px;
+            color: white;
+            margin-top: 30px;
+        }
+    </style>
 </head>
 <body>
-    <h1>Kontrola LED</h1>
+    <h1>Brama</h1>
 
-    <button onclick="changeLedState('ON')">Włącz</button>
-    <button onclick="changeLedState('OFF')">Wyłącz</button>
+    <button id="btnK1" onclick="activateRelay()"></button>
 
-    <p>Aktualny stan LED: <span id="ledStatus">Nieustawiony</span></p>
-
-    <p>Liczba zwarć: <span id="shortCount">0</span></p>
+    <p id="statusInfo">Stan bramy: nieznany</p>
 
     <script>
-        async function changeLedState(state) {
-            const response = await fetch(`/set?led=${state}`);
-            const result = await response.text();
-            document.getElementById('ledStatus').textContent = result;
+        async function activateRelay() {
+            const btn = document.getElementById("btnK1");
+
+            btn.disabled = true;
+            btn.style.pointerEvents = "none";
+            btn.style.borderColor = "aqua";
+
+            try {
+                await fetch("/click");
+            } catch (err) {
+                console.error("Błąd aktywacji przekaźnika:", err);
+            } finally {
+                setTimeout(() => {
+                    btn.style.borderColor = "black";
+                }, 500);
+                setTimeout(() => {
+                    btn.disabled = false;
+                    btn.style.pointerEvents = "auto";
+                }, 1500);
+            }
         }
 
-        // Sprawdzanie stanu LED co 2 sekundy
-        setInterval(async () => {
-            const response = await fetch('/get');
-            const ledStatus = await response.text();
-            document.getElementById('ledStatus').textContent = ledStatus;
-        }, 2000);
+        async function updateStatus() {
+            try {
+                const response = await fetch('/get');
+                const text = await response.text();
+                const [click, state] = text.trim().split(",");
 
-        // Sprawdzanie liczby zwarć co 2 sekundy
-        setInterval(async () => {
-            const response = await fetch('/get_count');
-            const shortCount = await response.text();
-            document.getElementById('shortCount').textContent = shortCount;
-        }, 2000);
+                const statusText = (state === "open") ? "Otwarta" : "Zamknięta";
+                document.getElementById('statusInfo').textContent = `Stan bramy: ${statusText}`;
+            } catch (error) {
+                console.error("Błąd pobierania stanu:", error);
+            }
+        }
+
+        setInterval(updateStatus, 5000);
+        updateStatus(); // od razu po załadowaniu
     </script>
+
 </body>
 </html>
