@@ -4,7 +4,7 @@ from flask import Flask, request
 app = Flask(__name__)
 
 hall_state = "closed"
-click_count = None  # Flaga jednorazowa
+click_count = 0  # Flaga jednorazowa
 
 
 @app.route('/')
@@ -25,10 +25,11 @@ def set_status():
 @app.route('/get')
 def get_relay_command():
     global click_count
-    # Pobieramy aktualny stan
-    response = f"{click_count if click_count is not None else 0},{hall_state}"
-    # Zerujemy po odczycie
-    click_count = None
+    if click_count is 0:
+        response = f"0,{hall_state}"
+    else:
+        response = f"1,{hall_state}"
+        click_count = 0  # resetujemy po odczycie tylko jeśli było kliknięcie
     return response
 
 
