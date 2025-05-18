@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template
+from flask import Flask, request
 
 app = Flask(__name__)
 
@@ -7,8 +7,8 @@ click_count = 0
 
 
 @app.route('/')
-def home():
-    return render_template("index.html")
+def index():
+    return open('index.html').read()
 
 @app.route('/set_status')
 def set_status():
