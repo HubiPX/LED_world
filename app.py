@@ -1,9 +1,14 @@
-from flask import Flask, request
+from flask import Flask, request, render_template
 
 app = Flask(__name__)
 
 hall_state = "closed"
 click_count = 0
+
+
+@app.route('/')
+def home():
+    return render_template("index.html")
 
 @app.route('/set_status')
 def set_status():
