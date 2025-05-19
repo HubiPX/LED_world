@@ -21,6 +21,9 @@ def set_status():
         return f"Status ustawiony na: {state}"
     return "Błąd", 400
 
+@app.route('/get_status')
+def get_status():
+    return hall_state
 
 @app.route('/get')
 def get_relay_command():
