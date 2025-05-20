@@ -53,8 +53,6 @@
 
     <button id="btnK1" onclick="activateRelay()"></button>
 
-    <p id="statusInfo">Stan bramy: nieznany</p>
-
         <script>
             async function activateRelay() {
                 const btn = document.getElementById("btnK1");
@@ -86,13 +84,11 @@
                     const btn = document.getElementById("btnK1");
 
                     if (state === "open") {
-                        btn.style.backgroundColor = "green";
+                        btn.style.background-color = "green";
                     } else if (state === "closed") {
-                        btn.style.backgroundColor = "red";
+                        btn.style.background-color = "red";
                     }
 
-                    // Jeśli chcesz ukryć tekst statusu:
-                    // document.getElementById('statusInfo').textContent = "";
                 } catch (error) {
                     console.error("Błąd pobierania stanu:", error);
                 }
