@@ -53,50 +53,50 @@
 
     <button id="btnK1" onclick="activateRelay()"></button>
 
-        <script>
-            async function activateRelay() {
+    <script>
+        async function activateRelay() {
+            const btn = document.getElementById("btnK1");
+
+            btn.disabled = true;
+            btn.style.pointerEvents = "none";
+            btn.style.borderColor = "aqua";
+
+            try {
+                await fetch("/click");
+            } catch (err) {
+                console.error("Błąd aktywacji przekaźnika:", err);
+            } finally {
+                setTimeout(() => {
+                    btn.style.borderColor = "black";
+                }, 500);
+                setTimeout(() => {
+                    btn.disabled = false;
+                    btn.style.pointerEvents = "auto";
+                }, 1500);
+            }
+        }
+
+        async function updateStatus() {
+            try {
+                const response = await fetch('/get_status');
+                const state = await response.text();
+
                 const btn = document.getElementById("btnK1");
 
-                btn.disabled = true;
-                btn.style.pointerEvents = "none";
-                btn.style.borderColor = "aqua";
-
-                try {
-                    await fetch("/click");
-                } catch (err) {
-                    console.error("Błąd aktywacji przekaźnika:", err);
-                } finally {
-                    setTimeout(() => {
-                        btn.style.borderColor = "black";
-                    }, 500);
-                    setTimeout(() => {
-                        btn.disabled = false;
-                        btn.style.pointerEvents = "auto";
-                    }, 1500);
+                if (state === "open") {
+                    btn.style.background-color = "green";
+                } else if (state === "closed") {
+                    btn.style.background-color = "red";
                 }
+
+            } catch (error) {
+                console.error("Błąd pobierania stanu:", error);
             }
+        }
 
-            async function updateStatus() {
-                try {
-                    const response = await fetch('/get_status');
-                    const state = await response.text();
-
-                    const btn = document.getElementById("btnK1");
-
-                    if (state === "open") {
-                        btn.style.background-color = "green";
-                    } else if (state === "closed") {
-                        btn.style.background-color = "red";
-                    }
-
-                } catch (error) {
-                    console.error("Błąd pobierania stanu:", error);
-                }
-            }
-
-            setInterval(updateStatus, 5000);
-            updateStatus(); // od razu po załadowaniu
-        </script>
+        setInterval(updateStatus, 5000);
+        updateStatus(); // od razu po załadowaniu
+    </script>
 
 </body>
 </html>
