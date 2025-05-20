@@ -23,7 +23,8 @@ def set_status():
 
 @app.route('/get_status')
 def get_status():
-    return hall_state
+    response = f"{hall_state}"
+    return response
 
 @app.route('/get')
 def get_relay_command():

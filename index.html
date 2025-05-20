@@ -55,44 +55,52 @@
 
     <p id="statusInfo">Stan bramy: nieznany</p>
 
-    <script>
-        async function activateRelay() {
-            const btn = document.getElementById("btnK1");
+        <script>
+            async function activateRelay() {
+                const btn = document.getElementById("btnK1");
 
-            btn.disabled = true;
-            btn.style.pointerEvents = "none";
-            btn.style.borderColor = "aqua";
+                btn.disabled = true;
+                btn.style.pointerEvents = "none";
+                btn.style.borderColor = "aqua";
 
-            try {
-                await fetch("/click");
-            } catch (err) {
-                console.error("Błąd aktywacji przekaźnika:", err);
-            } finally {
-                setTimeout(() => {
-                    btn.style.borderColor = "black";
-                }, 500);
-                setTimeout(() => {
-                    btn.disabled = false;
-                    btn.style.pointerEvents = "auto";
-                }, 1500);
+                try {
+                    await fetch("/click");
+                } catch (err) {
+                    console.error("Błąd aktywacji przekaźnika:", err);
+                } finally {
+                    setTimeout(() => {
+                        btn.style.borderColor = "black";
+                    }, 500);
+                    setTimeout(() => {
+                        btn.disabled = false;
+                        btn.style.pointerEvents = "auto";
+                    }, 1500);
+                }
             }
-        }
 
             async function updateStatus() {
                 try {
                     const response = await fetch('/get_status');
                     const state = await response.text();
 
-                    const statusText = (state === "open") ? "Otwarta" : "Zamknięta";
-                    document.getElementById('statusInfo').textContent = `Stan bramy: ${statusText}`;
+                    const btn = document.getElementById("btnK1");
+
+                    if (state === "open") {
+                        btn.style.backgroundColor = "green";
+                    } else if (state === "closed") {
+                        btn.style.backgroundColor = "red";
+                    }
+
+                    // Jeśli chcesz ukryć tekst statusu:
+                    // document.getElementById('statusInfo').textContent = "";
                 } catch (error) {
                     console.error("Błąd pobierania stanu:", error);
                 }
             }
 
-        setInterval(updateStatus, 5000);
-        updateStatus(); // od razu po załadowaniu
-    </script>
+            setInterval(updateStatus, 5000);
+            updateStatus(); // od razu po załadowaniu
+        </script>
 
 </body>
 </html>
