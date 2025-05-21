@@ -36,11 +36,11 @@ def get_relay_command():
     if click == 1 and time.time() - click_time > 60:
         click = 0
 
-    if click == 0:
-        response = f"0,{hall_state}"
-    else:
+    if click == 1:
         response = f"1,{hall_state}"
-        click = 0  # resetujemy po odczycie tylko jeśli było kliknięcie
+        click = 0
+    else:
+        response = f"0,{hall_state}"
     return response
 
 
