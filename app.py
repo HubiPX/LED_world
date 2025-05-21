@@ -31,7 +31,7 @@ def login():
             session['logged_in'] = True
             return redirect(url_for('index'))
         else:
-            return "Błędne hasło", 401
+            return open('login.html').read()
     return open('login.html').read()
 
 
