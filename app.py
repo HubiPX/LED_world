@@ -2,11 +2,13 @@ import os
 import time
 from flask import Flask, request, redirect, session, url_for
 from werkzeug.security import check_password_hash
+from datetime import timedelta
 
 app = Flask(__name__)
 
 # Sekretna wartość do sesji
 app.secret_key = os.getenv("FLASK_SECRET_KEY")
+app.permanent_session_lifetime = timedelta(days=365*10)
 
 # Oczekiwany hasz hasła użytkownika
 PASSWORD_HASH = os.getenv("PASSWORD_HASH")
@@ -28,6 +30,7 @@ def login():
     if request.method == 'POST':
         password = request.form.get('password')
         if check_password_hash(PASSWORD_HASH, password):
+            session.permanent = True
             session['logged_in'] = True
             return redirect(url_for('index'))
         else:
