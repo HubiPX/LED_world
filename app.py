@@ -13,9 +13,10 @@ app.permanent_session_lifetime = timedelta(days=365*10)
 # Oczekiwany hasz hasła użytkownika
 PASSWORD_HASH = os.getenv("PASSWORD_HASH")
 
-hall_state = "closed"
+hall_state = "noconnect"
 click = 0
 click_time = 0
+last_update_time = 0
 
 
 @app.route('/')
@@ -46,18 +47,25 @@ def logout():
 
 @app.route('/set_status')
 def set_status():
-    global hall_state
+    global hall_state, last_update_time
     state = request.args.get("state")
     if state in ["open", "closed"]:
         hall_state = state
+        last_update_time = time.time()
         return f"Status ustawiony na: {state}"
     return "Błąd", 400
 
 
 @app.route('/get_status')
 def get_status():
+    global hall_state, last_update_time
+
     if not session.get("logged_in"):
         return "Nieautoryzowany", 401
+
+    if time.time() - last_update_time > 60:
+        hall_state = "noconnect"
+
     response = f"{hall_state}"
     return response
 
