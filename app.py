@@ -34,7 +34,7 @@ def get_relay_command():
 
     # Sprawdzenie, czy minęło 60 sekund od kliknięcia
     if click == 1 and time.time() - click_time > 60:
-        click_count = 0
+        click = 0
 
     if click == 0:
         response = f"0,{hall_state}"
