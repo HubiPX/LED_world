@@ -1,10 +1,12 @@
 import os
+import time
 from flask import Flask, request
 
 app = Flask(__name__)
 
 hall_state = "closed"
-click_count = 0  # Flaga jednorazowa
+click = 0
+click_time = 0
 
 
 @app.route('/')
@@ -28,19 +30,25 @@ def get_status():
 
 @app.route('/get')
 def get_relay_command():
-    global click_count
-    if click_count is 0:
+    global click, click_time
+
+    # Sprawdzenie, czy minęło 60 sekund od kliknięcia
+    if click == 1 and time.time() - click_time > 60:
+        click_count = 0
+
+    if click == 0:
         response = f"0,{hall_state}"
     else:
         response = f"1,{hall_state}"
-        click_count = 0  # resetujemy po odczycie tylko jeśli było kliknięcie
+        click = 0  # resetujemy po odczycie tylko jeśli było kliknięcie
     return response
 
 
 @app.route('/click')
 def register_click():
-    global click_count
-    click_count = 1
+    global click, click_time
+    click = 1
+    click_time = time.time()
     return "Kliknięcie zarejestrowane."
 
 
