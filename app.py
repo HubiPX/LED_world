@@ -6,11 +6,10 @@ from datetime import timedelta
 
 app = Flask(__name__)
 
-# Sekretna wartość do sesji
+# v1.0
 app.secret_key = os.getenv("FLASK_SECRET_KEY")
 app.permanent_session_lifetime = timedelta(days=365*10)
 
-# Oczekiwany hasz hasła użytkownika
 PASSWORD_HASH = os.getenv("PASSWORD_HASH")
 
 hall_state = "noconnect"
