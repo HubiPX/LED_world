@@ -66,9 +66,14 @@
             btn.style.borderColor = "aqua";
 
             try {
-                await fetch("/click");
+                const response = await fetch("/click");
+                if (!response.ok) {
+                    const message = await response.text();
+                    alert(message);
+                }
             } catch (err) {
                 console.error("Błąd aktywacji przekaźnika:", err);
+                alert("Wystąpił błąd połączenia.");
             } finally {
                 setTimeout(() => {
                     btn.style.borderColor = "black";
