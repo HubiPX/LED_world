@@ -16,7 +16,6 @@ hall_state = "noconnect"
 click = 0
 click_time = 0
 last_update_time = 0
-last_get_time = 0
 
 
 @app.route('/')
@@ -72,18 +71,17 @@ def get_status():
 
 @app.route('/get')
 def get_relay_command():
-    global click, click_time, last_get_time
+    global click, click_time
 
     if click == 1 and time.time() - click_time > 60:
         click = 0
-        last_get_time = 0
+
     if click == 1:
         response = f"1,{hall_state}"
         click = 0
-        last_get_time = time.time()
     else:
         response = f"0,{hall_state}"
-        last_get_time = 0
+
     return response
 
 
@@ -92,15 +90,12 @@ def register_click():
     if not session.get("logged_in"):
         return "Nieautoryzowany", 401
 
-    global click, click_time, last_get_time
+    global click, click_time
 
     current_time = time.time()
 
     if click == 1:
         return "Poczekaj na wykonanie.", 429
-
-    if current_time - last_get_time < 20:
-        return "Poczekaj brama w ruchu.", 429
 
     click = 1
     click_time = current_time
