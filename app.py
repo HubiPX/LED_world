@@ -12,12 +12,20 @@ app.permanent_session_lifetime = timedelta(days=365*10)
 
 PASSWORD_HASH = os.getenv("PASSWORD_HASH")
 
+# gate 1
 hall_state = "noconnect"
 click = 0
 click_time = 0
 last_update_time = 0
 
+# gate 2
+hall_state_2 = "noconnect"
+click_2 = 0
+click_time_2 = 0
+last_update_time_2 = 0
 
+
+# gate 1
 @app.route('/')
 def index():
     if not session.get("logged_in"):
@@ -100,6 +108,63 @@ def register_click():
     click = 1
     click_time = current_time
     return "Kliknięcie zarejestrowane."
+
+
+# gate 2
+@app.route('/set_status_2')
+def set_status_2():
+    global hall_state_2, last_update_time_2
+    state = request.args.get("state")
+    if state in ["open", "closed"]:
+        hall_state_2 = state
+        last_update_time_2 = time.time()
+        return f"Status 2 ustawiony na: {state}"
+    return "Błąd", 400
+
+
+@app.route('/get_status_2')
+def get_status_2():
+    global hall_state_2, last_update_time_2
+
+    if not session.get("logged_in"):
+        return "Nieautoryzowany", 401
+
+    if time.time() - last_update_time_2 > 60:
+        hall_state_2 = "noconnect"
+
+    return hall_state_2
+
+
+@app.route('/get_2')
+def get_relay_command_2():
+    global click_2, click_time_2
+
+    if click_2 == 1 and time.time() - click_time_2 > 60:
+        click_2 = 0
+
+    if click_2 == 1:
+        response = f"1,{hall_state_2}"
+        click_2 = 0
+    else:
+        response = f"0,{hall_state_2}"
+
+    return response
+
+
+@app.route('/click_2')
+def register_click_2():
+    if not session.get("logged_in"):
+        return "Nieautoryzowany", 401
+
+    global click_2, click_time_2
+    current_time = time.time()
+
+    if click_2 == 1:
+        return "Poczekaj na wykonanie.", 429
+
+    click_2 = 1
+    click_time_2 = current_time
+    return "Kliknięcie bramy 2 zarejestrowane."
 
 
 if __name__ == '__main__':

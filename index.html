@@ -43,6 +43,20 @@
             color: transparent;
             display: block;
         }
+        #btnK2 {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            aspect-ratio: 2 / 1;
+            margin: 20px auto;
+            cursor: pointer;
+            border: 5px solid black;
+            border-radius: 20px;
+            overflow: hidden;
+            background-color: grey;
+            transition: background-color 0.2s;
+            display: block;
+        }
         #statusInfo {
             font-size: 48px;
             color: white;
@@ -51,9 +65,12 @@
     </style>
 </head>
 <body>
-    <h1>Brama</h1>
-
+    <h1>Garaż</h1>
     <button id="btnK1" onclick="activateRelay()"></button>
+
+    <h1>Wjazd</h1>
+    <button id="btnK2" onclick="activateRelay2()"></button>
+
     <div style="position: absolute; top: 20px; right: 20px;">
         <a href="/logout" style="color: black; font-size: 20px; text-decoration: none;">Wyloguj</a>
     </div>
@@ -107,6 +124,56 @@
 
         setInterval(updateStatus, 5000);
         updateStatus(); // od razu po załadowaniu
+
+        async function activateRelay2() {
+            const btn = document.getElementById("btnK2");
+
+            btn.disabled = true;
+            btn.style.pointerEvents = "none";
+            btn.style.borderColor = "aqua";
+
+            try {
+                const response = await fetch("/click_2");
+                if (!response.ok) {
+                    const message = await response.text();
+                    alert(message);
+                }
+            } catch (err) {
+                console.error("Błąd aktywacji przekaźnika:", err);
+                alert("Wystąpił błąd połączenia.");
+            } finally {
+                setTimeout(() => {
+                    btn.style.borderColor = "black";
+                }, 500);
+                setTimeout(() => {
+                    btn.disabled = false;
+                    btn.style.pointerEvents = "auto";
+                }, 1500);
+            }
+        }
+
+        async function updateStatus2() {
+            try {
+                const response = await fetch('/get_status_2');
+                const state = await response.text();
+
+                const btn = document.getElementById("btnK2");
+
+                if (state === "open") {
+                    btn.style.backgroundColor = "green";
+                } else if (state === "closed") {
+                    btn.style.backgroundColor = "red";
+                } else if (state === "noconnect") {
+                    btn.style.backgroundColor = "orange";
+                }
+
+            } catch (error) {
+                console.error("Błąd pobierania stanu:", error);
+            }
+        }
+
+        setInterval(updateStatus2, 5000);
+        updateStatus2(); // od razu po załadowaniu
     </script>
 
 </body>
