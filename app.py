@@ -167,6 +167,61 @@ def register_click_2():
     return "Kliknięcie bramy 2 zarejestrowane."
 
 
+# all gates
+@app.route('/all_open')
+def all_open():
+    if not session.get("logged_in"):
+        return "Nieautoryzowany", 401
+
+    actions = []
+
+    if hall_state == "closed":
+        global click, click_time
+        if click == 0:
+            click = 1
+            click_time = time.time()
+            actions.append("brama1")
+
+    if hall_state_2 == "closed":
+        global click_2, click_time_2
+        if click_2 == 0:
+            click_2 = 1
+            click_time_2 = time.time()
+            actions.append("brama2")
+
+    if not actions:
+        return "Wszystkie bramy są już otwarte"
+
+    return f"Otwieranie: {', '.join(actions)}"
+
+
+@app.route('/all_close')
+def all_close():
+    if not session.get("logged_in"):
+        return "Nieautoryzowany", 401
+
+    actions = []
+
+    if hall_state == "open":
+        global click, click_time
+        if click == 0:
+            click = 1
+            click_time = time.time()
+            actions.append("brama1")
+
+    if hall_state_2 == "open":
+        global click_2, click_time_2
+        if click_2 == 0:
+            click_2 = 1
+            click_time_2 = time.time()
+            actions.append("brama2")
+
+    if not actions:
+        return "Wszystkie bramy są już zamknięte"
+
+    return f"Zamykanie: {', '.join(actions)}"
+
+
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 8080))
     app.run(host='0.0.0.0', port=port)
