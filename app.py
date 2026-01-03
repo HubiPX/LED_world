@@ -24,6 +24,9 @@ click_2 = 0
 click_time_2 = 0
 last_update_time_2 = 0
 
+last_all_action_time = 0
+ALL_ACTION_COOLDOWN = 30  # sekundy
+
 
 # gate 1
 @app.route('/')
@@ -173,23 +176,30 @@ def all_open():
     if not session.get("logged_in"):
         return "Nieautoryzowany", 401
 
-    actions = []
-
     global click, click_time, click_2, click_time_2
+    global last_all_action_time
+
+    now = time.time()
+    if now - last_all_action_time < ALL_ACTION_COOLDOWN:
+        remaining = int(ALL_ACTION_COOLDOWN - (now - last_all_action_time))
+        return f"Poczekaj {remaining}s przed kolejną akcją", 429
+
+    actions = []
 
     if hall_state == "closed":
         click = 1
-        click_time = time.time()
+        click_time = now
         actions.append("brama1")
 
     if hall_state_2 == "closed":
         click_2 = 1
-        click_time_2 = time.time()
+        click_time_2 = now
         actions.append("brama2")
 
     if not actions:
         return "Wszystkie bramy są już otwarte"
 
+    last_all_action_time = now
     return f"Otwieranie: {', '.join(actions)}"
 
 
@@ -198,23 +208,30 @@ def all_close():
     if not session.get("logged_in"):
         return "Nieautoryzowany", 401
 
-    actions = []
-
     global click, click_time, click_2, click_time_2
+    global last_all_action_time
+
+    now = time.time()
+    if now - last_all_action_time < ALL_ACTION_COOLDOWN:
+        remaining = int(ALL_ACTION_COOLDOWN - (now - last_all_action_time))
+        return f"Poczekaj {remaining}s przed kolejną akcją", 429
+
+    actions = []
 
     if hall_state == "open":
         click = 1
-        click_time = time.time()
+        click_time = now
         actions.append("brama1")
 
     if hall_state_2 == "open":
         click_2 = 1
-        click_time_2 = time.time()
+        click_time_2 = now
         actions.append("brama2")
 
     if not actions:
         return "Wszystkie bramy są już zamknięte"
 
+    last_all_action_time = now
     return f"Zamykanie: {', '.join(actions)}"
 
 
