@@ -101,8 +101,8 @@
     </div>
 
     <div id="globalControls" style="display: flex; justify-content: space-between; max-width: 500px; margin: 20px auto;">
-        <button id="btnAllClose" class="globalBtn" style="background-color: red;" onclick="callAll('/all_close')"></button>
-        <button id="btnAllOpen"  class="globalBtn" style="background-color: green;" onclick="callAll('/all_open')"></button>
+        <button id="btnAllClose" class="globalBtn" style="background-color: red;" onclick="callAll('/all_close')" disabled></button>
+        <button id="btnAllOpen"  class="globalBtn" style="background-color: green;" onclick="callAll('/all_open')" disabled></button>
     </div>
     <script>
         async function activateRelay() {
@@ -232,10 +232,13 @@
                     fetch('/get_status_2').then(r => r.text())
                 ]);
 
-                const disable = (s1 === "noconnect" || s2 === "noconnect");
+                const enabled = (s1 !== "noconnect" && s2 !== "noconnect");
 
-                document.getElementById("btnAllClose").disabled = disable;
-                document.getElementById("btnAllOpen").disabled  = disable;
+                const btnClose = document.getElementById("btnAllClose");
+                const btnOpen  = document.getElementById("btnAllOpen");
+
+                btnClose.disabled = !enabled;
+                btnOpen.disabled  = !enabled;
 
             } catch {
                 document.getElementById("btnAllClose").disabled = true;
