@@ -57,11 +57,10 @@ def logout():
 
 @app.route('/set_status')
 def set_status():
-    global hall_state, last_update_time
+    global hall_state
     state = request.args.get("state")
     if state in ["open", "closed"]:
         hall_state = state
-        last_update_time = time.time()
         return f"Status ustawiony na: {state}"
     return "Błąd", 400
 
@@ -82,7 +81,9 @@ def get_status():
 
 @app.route('/get')
 def get_relay_command():
-    global click, click_time
+    global click, click_time, last_update_time
+
+    last_update_time = time.time()
 
     if click == 1 and time.time() - click_time > 60:
         click = 0
@@ -116,11 +117,10 @@ def register_click():
 # gate 2
 @app.route('/set_status_2')
 def set_status_2():
-    global hall_state_2, last_update_time_2
+    global hall_state_2
     state = request.args.get("state")
     if state in ["open", "closed"]:
         hall_state_2 = state
-        last_update_time_2 = time.time()
         return f"Status 2 ustawiony na: {state}"
     return "Błąd", 400
 
@@ -140,7 +140,9 @@ def get_status_2():
 
 @app.route('/get_2')
 def get_relay_command_2():
-    global click_2, click_time_2
+    global click_2, click_time_2, last_update_time_2
+
+    last_update_time_2 = time.time()
 
     if click_2 == 1 and time.time() - click_time_2 > 60:
         click_2 = 0
