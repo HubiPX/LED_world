@@ -148,10 +148,10 @@ def get_relay_command_2():
         click_2 = 0
 
     if click_2 == 1:
-        response = f"1,{hall_state_2}"
+        response = "1"
         click_2 = 0
     else:
-        response = f"0,{hall_state_2}"
+        response = "0"
 
     return response
 
