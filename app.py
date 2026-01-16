@@ -12,6 +12,8 @@ app.permanent_session_lifetime = timedelta(days=365*10)
 
 PASSWORD_HASH = os.getenv("PASSWORD_HASH")
 
+ESP_API_KEY = os.getenv("ESP_API_KEY")
+
 # gate 1
 hall_state = "noconnect"
 click = 0
@@ -26,6 +28,11 @@ last_update_time_2 = 0
 
 last_all_action_time = 0
 ALL_ACTION_COOLDOWN = 30  # sekundy
+
+
+def require_esp_key():
+    key = request.headers.get("X-ESP-KEY")
+    return key == ESP_API_KEY
 
 
 # gate 1
@@ -118,6 +125,10 @@ def register_click():
 @app.route('/set_status_2')
 def set_status_2():
     global hall_state_2
+
+    if not require_esp_key():
+        return "Unauthorized", 401
+
     state = request.args.get("state")
     if state in ["open", "closed"]:
         hall_state_2 = state
@@ -141,6 +152,9 @@ def get_status_2():
 @app.route('/get_2')
 def get_relay_command_2():
     global click_2, click_time_2, last_update_time_2
+
+    if not require_esp_key():
+        return "Unauthorized", 401
 
     last_update_time_2 = time.time()
 
