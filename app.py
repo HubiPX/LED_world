@@ -65,6 +65,10 @@ def logout():
 @app.route('/set_status')
 def set_status():
     global hall_state
+
+    if not require_esp_key():
+        return "Nieautoryzowany", 401
+
     state = request.args.get("state")
     if state in ["open", "closed"]:
         hall_state = state
@@ -90,16 +94,19 @@ def get_status():
 def get_relay_command():
     global click, click_time, last_update_time
 
+    if not require_esp_key():
+        return "Nieautoryzowany", 401
+
     last_update_time = time.time()
 
     if click == 1 and time.time() - click_time > 60:
         click = 0
 
     if click == 1:
-        response = f"1,{hall_state}"
+        response = "1"
         click = 0
     else:
-        response = f"0,{hall_state}"
+        response = "0"
 
     return response
 
@@ -127,7 +134,7 @@ def set_status_2():
     global hall_state_2
 
     if not require_esp_key():
-        return "Unauthorized", 401
+        return "Nieautoryzowany", 401
 
     state = request.args.get("state")
     if state in ["open", "closed"]:
@@ -154,7 +161,7 @@ def get_relay_command_2():
     global click_2, click_time_2, last_update_time_2
 
     if not require_esp_key():
-        return "Unauthorized", 401
+        return "Nieautoryzowany", 401
 
     last_update_time_2 = time.time()
 
