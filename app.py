@@ -99,20 +99,6 @@ def set_status():
     return "Błąd", 400
 
 
-@app.route('/get_status')
-def get_status():
-    global hall_state, last_update_time
-
-    if not session.get("logged_in"):
-        return "Nieautoryzowany", 401
-
-    if time.time() - last_update_time > 60:
-        hall_state = "noconnect"
-
-    response = f"{hall_state}"
-    return response
-
-
 @app.route('/get')
 def get_relay_command():
     global click, click_time, last_update_time
@@ -134,9 +120,23 @@ def get_relay_command():
     return response
 
 
+@app.route('/get_status')
+def get_status():
+    global hall_state, last_update_time
+
+    if session.get("role") != "admin":
+        return "Nieautoryzowany", 401
+
+    if time.time() - last_update_time > 60:
+        hall_state = "noconnect"
+
+    response = f"{hall_state}"
+    return response
+
+
 @app.route('/click')
 def register_click():
-    if not session.get("logged_in"):
+    if session.get("role") != "admin":
         return "Nieautoryzowany", 401
 
     global click, click_time
@@ -166,19 +166,6 @@ def set_status_2():
     return "Błąd", 400
 
 
-@app.route('/get_status_2')
-def get_status_2():
-    global hall_state_2, last_update_time_2
-
-    if not session.get("logged_in"):
-        return "Nieautoryzowany", 401
-
-    if time.time() - last_update_time_2 > 60:
-        hall_state_2 = "noconnect"
-
-    return hall_state_2
-
-
 @app.route('/get_2')
 def get_relay_command_2():
     global click_2, click_time_2, last_update_time_2
@@ -200,9 +187,22 @@ def get_relay_command_2():
     return response
 
 
+@app.route('/get_status_2')
+def get_status_2():
+    global hall_state_2, last_update_time_2
+
+    if session.get("role") != "admin":
+        return "Nieautoryzowany", 401
+
+    if time.time() - last_update_time_2 > 60:
+        hall_state_2 = "noconnect"
+
+    return hall_state_2
+
+
 @app.route('/click_2')
 def register_click_2():
-    if not session.get("logged_in"):
+    if session.get("role") != "admin":
         return "Nieautoryzowany", 401
 
     global click_2, click_time_2
@@ -231,19 +231,6 @@ def set_status_3():
     return "Błąd", 400
 
 
-@app.route('/get_status_3')
-def get_status_3():
-    global hall_state_3, last_update_time_3
-
-    if not session.get("logged_in"):
-        return "Nieautoryzowany", 401
-
-    if time.time() - last_update_time_3 > 60:
-        hall_state_3 = "noconnect"
-
-    return hall_state_3
-
-
 @app.route('/get_3')
 def get_relay_command_3():
     global click_3, click_time_3, last_update_time_3
@@ -265,9 +252,24 @@ def get_relay_command_3():
     return response
 
 
+@app.route('/get_status_3')
+def get_status_3():
+    global hall_state_3, last_update_time_3
+
+    role = session.get("role")
+    if role not in ["admin", "gate3"]:
+        return "Nieautoryzowany", 401
+
+    if time.time() - last_update_time_3 > 60:
+        hall_state_3 = "noconnect"
+
+    return hall_state_3
+
+
 @app.route('/click_3')
 def register_click_3():
-    if not session.get("logged_in"):
+    role = session.get("role")
+    if role not in ["admin", "gate3"]:
         return "Nieautoryzowany", 401
 
     global click_3, click_time_3
@@ -284,7 +286,7 @@ def register_click_3():
 # all gates
 @app.route('/all_open')
 def all_open():
-    if not session.get("logged_in"):
+    if session.get("role") != "admin":
         return "Nieautoryzowany", 401
 
     global click, click_time, click_2, click_time_2
@@ -316,7 +318,7 @@ def all_open():
 
 @app.route('/all_close')
 def all_close():
-    if not session.get("logged_in"):
+    if session.get("role") != "admin":
         return "Nieautoryzowany", 401
 
     global click, click_time, click_2, click_time_2
