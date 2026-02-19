@@ -2,64 +2,120 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <title>Bramа 3</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hektor</title>
+
     <style>
         body {
             text-align: center;
             padding: 50px;
-            font-family: Arial;
+            font-family: Arial, sans-serif;
             background-color: #474646;
         }
+
+        h1 {
+            font-size: 40px;
+            color: black;
+            margin-bottom: 30px;
+        }
+
         #btnK3 {
+            position: relative;
             width: 100%;
             max-width: 600px;
             aspect-ratio: 2 / 1;
-            margin: 40px auto;
+            margin: 20px auto;
             cursor: pointer;
             border: 5px solid black;
             border-radius: 20px;
+            overflow: hidden;
             background-color: grey;
+            transition: background-color 0.2s, border-color 0.2s, box-shadow 0.2s;
+            display: block;
+        }
+
+        #btnK3:active {
+            border-color: aqua;
+            box-shadow: 0 0 10px 3px rgba(0, 255, 255, 0.7);
+        }
+
+        #btnK3:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        #logout {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: black;
+            font-size: 18px;
+            text-decoration: none;
         }
     </style>
 </head>
 <body>
 
+<a id="logout" href="/logout">Wyloguj</a>
+
 <h1>Hektor</h1>
+
 <button id="btnK3" onclick="activateRelay3()"></button>
 
 <script>
-async function activateRelay3() {
-    const btn = document.getElementById("btnK3");
-    btn.disabled = true;
+    async function activateRelay3() {
+        const btn = document.getElementById("btnK3");
 
-    try {
-        await fetch("/click_3");
-    } catch {
-        alert("Błąd połączenia");
+        btn.disabled = true;
+        btn.style.pointerEvents = "none";
+        btn.style.borderColor = "aqua";
+
+        try {
+            const response = await fetch("/click_3");
+
+            if (!response.ok) {
+                const message = await response.text();
+                alert(message);
+            }
+
+        } catch (err) {
+            console.error("Błąd aktywacji przekaźnika:", err);
+            alert("Wystąpił błąd połączenia.");
+        } finally {
+
+            setTimeout(() => {
+                btn.style.borderColor = "black";
+            }, 500);
+
+            setTimeout(() => {
+                btn.disabled = false;
+                btn.style.pointerEvents = "auto";
+            }, 1500);
+        }
     }
 
-    setTimeout(() => {
-        btn.disabled = false;
-    }, 1500);
-}
+    async function updateStatus3() {
+        try {
+            const response = await fetch('/get_status_3');
+            const state = await response.text();
 
-async function updateStatus3() {
-    const response = await fetch('/get_status_3');
-    const state = await response.text();
+            const btn = document.getElementById("btnK3");
 
-    const btn = document.getElementById("btnK3");
+            if (state === "open") {
+                btn.style.backgroundColor = "green";
+            } else if (state === "closed") {
+                btn.style.backgroundColor = "red";
+            } else if (state === "noconnect") {
+                btn.style.backgroundColor = "orange";
+            }
 
-    if (state === "open") {
-        btn.style.backgroundColor = "green";
-    } else if (state === "closed") {
-        btn.style.backgroundColor = "red";
-    } else {
-        btn.style.backgroundColor = "orange";
+        } catch (error) {
+            console.error("Błąd pobierania stanu:", error);
+        }
     }
-}
 
-setInterval(updateStatus3, 2000);
-updateStatus3();
+    setInterval(updateStatus3, 2000);
+    updateStatus3();
 </script>
 
 </body>
