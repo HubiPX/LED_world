@@ -26,6 +26,13 @@ click_2 = 0
 click_time_2 = 0
 last_update_time_2 = 0
 
+# gate 3
+hall_state_3 = "noconnect"
+click_3 = 0
+click_time_3 = 0
+last_update_time_3 = 0
+
+
 last_all_action_time = 0
 ALL_ACTION_COOLDOWN = 30  # sekundy
 
@@ -54,6 +61,14 @@ def login():
         else:
             return open('login.html').read()
     return open('login.html').read()
+
+
+@app.route('/gate3')
+def gate3():
+    if not session.get("logged_in"):
+        return redirect(url_for("login"))
+
+    return open('gate3.html').read()
 
 
 @app.route('/logout')
@@ -191,6 +206,71 @@ def register_click_2():
     click_2 = 1
     click_time_2 = current_time
     return "Kliknięcie bramy 2 zarejestrowane."
+
+
+# gate 3
+@app.route('/set_status_3')
+def set_status_3():
+    global hall_state_3
+
+    if not require_esp_key():
+        return "Nieautoryzowany", 401
+
+    state = request.args.get("state")
+    if state in ["open", "closed"]:
+        hall_state_3 = state
+        return f"Status 3 ustawiony na: {state}"
+    return "Błąd", 400
+
+
+@app.route('/get_status_3')
+def get_status_3():
+    global hall_state_3, last_update_time_3
+
+    if not session.get("logged_in"):
+        return "Nieautoryzowany", 401
+
+    if time.time() - last_update_time_3 > 60:
+        hall_state_3 = "noconnect"
+
+    return hall_state_3
+
+
+@app.route('/get_3')
+def get_relay_command_3():
+    global click_3, click_time_3, last_update_time_3
+
+    if not require_esp_key():
+        return "Nieautoryzowany", 401
+
+    last_update_time_3 = time.time()
+
+    if click_3 == 1 and time.time() - click_time_3 > 60:
+        click_3 = 0
+
+    if click_3 == 1:
+        response = "1"
+        click_3 = 0
+    else:
+        response = "0"
+
+    return response
+
+
+@app.route('/click_3')
+def register_click_3():
+    if not session.get("logged_in"):
+        return "Nieautoryzowany", 401
+
+    global click_3, click_time_3
+    current_time = time.time()
+
+    if click_3 == 1:
+        return "Poczekaj na wykonanie.", 429
+
+    click_3 = 1
+    click_time_3 = current_time
+    return "Kliknięcie bramy 3 zarejestrowane."
 
 
 # all gates

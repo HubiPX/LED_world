@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Bramа 3</title>
+    <style>
+        body {
+            text-align: center;
+            padding: 50px;
+            font-family: Arial;
+            background-color: #474646;
+        }
+        #btnK3 {
+            width: 100%;
+            max-width: 600px;
+            aspect-ratio: 2 / 1;
+            margin: 40px auto;
+            cursor: pointer;
+            border: 5px solid black;
+            border-radius: 20px;
+            background-color: grey;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Hektor</h1>
+<button id="btnK3" onclick="activateRelay3()"></button>
+
+<script>
+async function activateRelay3() {
+    const btn = document.getElementById("btnK3");
+    btn.disabled = true;
+
+    try {
+        await fetch("/click_3");
+    } catch {
+        alert("Błąd połączenia");
+    }
+
+    setTimeout(() => {
+        btn.disabled = false;
+    }, 1500);
+}
+
+async function updateStatus3() {
+    const response = await fetch('/get_status_3');
+    const state = await response.text();
+
+    const btn = document.getElementById("btnK3");
+
+    if (state === "open") {
+        btn.style.backgroundColor = "green";
+    } else if (state === "closed") {
+        btn.style.backgroundColor = "red";
+    } else {
+        btn.style.backgroundColor = "orange";
+    }
+}
+
+setInterval(updateStatus3, 2000);
+updateStatus3();
+</script>
+
+</body>
+</html>
