@@ -10,6 +10,7 @@ app = Flask(__name__)
 app.secret_key = os.getenv("FLASK_SECRET_KEY")
 app.permanent_session_lifetime = timedelta(days=365*10)
 
+ADMIN_PASSWORD_HASH = os.getenv("ADMIN_PASSWORD_HASH")
 PASSWORD_HASH = os.getenv("PASSWORD_HASH")
 
 ESP_API_KEY = os.getenv("ESP_API_KEY")
@@ -45,7 +46,7 @@ def require_esp_key():
 # gate 1
 @app.route('/')
 def index():
-    if not session.get("logged_in"):
+    if session.get("role") != "admin":
         return redirect(url_for("login"))
     return open('index.html').read()
 
@@ -54,10 +55,16 @@ def index():
 def login():
     if request.method == 'POST':
         password = request.form.get('password')
-        if check_password_hash(PASSWORD_HASH, password):
+
+        if check_password_hash(ADMIN_PASSWORD_HASH, password):
             session.permanent = True
-            session['logged_in'] = True
+            session['role'] = "admin"
             return redirect(url_for('index'))
+
+        elif check_password_hash(PASSWORD_HASH, password):
+            session.permanent = True
+            session['role'] = "gate3"
+            return redirect(url_for('gate3'))
         else:
             return open('login.html').read()
     return open('login.html').read()
@@ -65,8 +72,9 @@ def login():
 
 @app.route('/gate3')
 def gate3():
-    if not session.get("logged_in"):
-        return redirect(url_for("login"))
+    role = session.get("role")
+    if role not in ["admin", "gate3"]:
+        return "Nieautoryzowany", 401
 
     return open('gate3.html').read()
 
