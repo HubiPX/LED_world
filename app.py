@@ -160,9 +160,12 @@ def set_status_2():
         return "Nieautoryzowany", 401
 
     state = request.args.get("state")
-    if state in ["open", "closed"]:
-        hall_state_2 = state
-        return f"Status 2 ustawiony na: {state}"
+    if state == "open":
+        hall_state_2 = "closed"
+        return f"Status 2 ustawiony na: closed"
+    elif state == "closed":
+        hall_state_2 = "open"
+        return f"Status 2 ustawiony na: open"
     return "Błąd", 400
 
 
