@@ -160,6 +160,7 @@ def set_status_2():
         return "Nieautoryzowany", 401
 
     state = request.args.get("state")
+    # zmieniona logika halla dla bramy wjazdowej
     if state == "open":
         hall_state_2 = "closed"
         return f"Status 2 ustawiony na: closed"
