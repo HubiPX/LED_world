@@ -62,68 +62,73 @@
     </style>
 </head>
 <body>
+    <a id="logout" href="/logout">Wyloguj</a>
 
-<a id="logout" href="/logout">Wyloguj</a>
+    <h1>Etor</h1>
 
-<h1>Hektor</h1>
+    <button id="btnK3" onclick="activateRelay3()"></button>
 
-<button id="btnK3" onclick="activateRelay3()"></button>
-
-<script>
-    async function activateRelay3() {
-        const btn = document.getElementById("btnK3");
-
-        btn.disabled = true;
-        btn.style.pointerEvents = "none";
-        btn.style.borderColor = "aqua";
-
-        try {
-            const response = await fetch("/click_3");
-
-            if (!response.ok) {
-                const message = await response.text();
-                alert(message);
-            }
-
-        } catch (err) {
-            console.error("Błąd aktywacji przekaźnika:", err);
-            alert("Wystąpił błąd połączenia.");
-        } finally {
-
-            setTimeout(() => {
-                btn.style.borderColor = "black";
-            }, 500);
-
-            setTimeout(() => {
-                btn.disabled = false;
-                btn.style.pointerEvents = "auto";
-            }, 1500);
-        }
-    }
-
-    async function updateStatus3() {
-        try {
-            const response = await fetch('/get_status_3');
-            const state = await response.text();
-
+    <div style="position: absolute; top: 20px; left: 20px;">
+        <a href="/" style="color: black; font-size: 20px; text-decoration: none;">Hubert</a>
+    </div>
+    <script>
+        async function activateRelay3() {
             const btn = document.getElementById("btnK3");
 
-            if (state === "open") {
-                btn.style.backgroundColor = "green";
-            } else if (state === "closed") {
-                btn.style.backgroundColor = "red";
-            } else if (state === "noconnect") {
-                btn.style.backgroundColor = "orange";
-            }
+            btn.disabled = true;
+            btn.style.pointerEvents = "none";
+            btn.style.borderColor = "aqua";
 
-        } catch (error) {
-            console.error("Błąd pobierania stanu:", error);
+            try {
+                const response = await fetch("/click_3");
+
+                if (!response.ok) {
+                    const message = await response.text();
+                    alert(message);
+                }
+
+            } catch (err) {
+                console.error("Błąd aktywacji przekaźnika:", err);
+                alert("Wystąpił błąd połączenia.");
+            } finally {
+
+                setTimeout(() => {
+                    btn.style.borderColor = "black";
+                }, 500);
+
+                setTimeout(() => {
+                    btn.disabled = false;
+                    btn.style.pointerEvents = "auto";
+                }, 1500);
+            }
         }
-    }
+
+        async function updateStatus3() {
+            try {
+                const response = await fetch('/get_status_3');
+                const state = await response.text();
+
+                const btn = document.getElementById("btnK3");
+
+                if (state === "open") {
+                    btn.style.backgroundColor = "green";
+                } else if (state === "closed") {
+                    btn.style.backgroundColor = "red";
+                } else if (state === "noconnect") {
+                    btn.style.backgroundColor = "orange";
+                }
+
+            } catch (error) {
+                console.error("Błąd pobierania stanu:", error);
+            }
+        }
 
     setInterval(updateStatus3, 2000);
     updateStatus3();
 </script>
 
+        setInterval(updateStatus3, 2000);
+        updateStatus3();
+    </script>
 </body>
 </html>
