@@ -58,35 +58,6 @@
             transition: background-color 0.2s;
             display: block;
         }
-        #statusInfo {
-            font-size: 48px;
-            color: white;
-            margin-top: 30px;
-        }
-        .globalBtn {
-            width: 70px;
-            height: 70px;
-            border-radius: 50%;
-            border: 4px solid black;
-            cursor: pointer;
-            font-size: 12px;
-            text-align: center;
-            line-height: 70px;
-            opacity: 0.9;
-            transition: opacity 0.2s, transform 0.2s, box-shadow 0.2s, border-color 0.2s;
-        }
-
-        .globalBtn:active {
-            border-color: aqua;
-            box-shadow: 0 0 10px 3px rgba(0, 255, 255, 0.7);
-        }
-
-        .globalBtn:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-            box-shadow: none;
-            border-color: black;
-        }
     </style>
 </head>
 <body>
@@ -102,11 +73,6 @@
 
     <div style="position: absolute; top: 20px; left: 20px;">
         <a href="/gate3" style="color: black; font-size: 20px; text-decoration: none;">Alek</a>
-    </div>
-
-    <div id="globalControls" style="display: flex; justify-content: space-between; max-width: 500px; margin: 20px auto;">
-        <button id="btnAllClose" class="globalBtn" style="background-color: red;" onclick="callAll('/all_close')" disabled></button>
-        <button id="btnAllOpen"  class="globalBtn" style="background-color: green;" onclick="callAll('/all_open')" disabled></button>
     </div>
     <script>
         async function activateRelay() {
@@ -210,47 +176,6 @@
 
         setInterval(updateStatus2, 2000);
         updateStatus2(); // od razu po załadowaniu
-
-        async function getGlobalStates() {
-            const [s1, s2] = await Promise.all([
-                fetch('/get_status').then(r => r.text()),
-                fetch('/get_status_2').then(r => r.text())
-            ]);
-            return { s1, s2 };
-        }
-
-        async function callAll(url) {
-            try {
-                const res = await fetch(url);
-                const text = await res.text();
-                alert(text);
-            } catch {
-                alert("Błąd połączenia");
-            }
-        }
-
-        async function updateGlobalButtons() {
-            try {
-                const [s1, s2] = await Promise.all([
-                    fetch('/get_status').then(r => r.text()),
-                    fetch('/get_status_2').then(r => r.text())
-                ]);
-
-                const enabled = (s1 !== "noconnect" && s2 !== "noconnect");
-
-                const btnClose = document.getElementById("btnAllClose");
-                const btnOpen  = document.getElementById("btnAllOpen");
-
-                btnClose.disabled = !enabled;
-                btnOpen.disabled  = !enabled;
-
-            } catch {
-                document.getElementById("btnAllClose").disabled = true;
-                document.getElementById("btnAllOpen").disabled  = true;
-            }
-        }
-
-        updateGlobalButtons();
     </script>
 
 </body>
