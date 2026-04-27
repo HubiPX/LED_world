@@ -34,9 +34,6 @@ click_time_3 = 0
 last_update_time_3 = 0
 
 
-last_all_action_time = 0
-ALL_ACTION_COOLDOWN = 30  # sekundy
-
 
 def require_esp_key():
     key = request.headers.get("X-ESP-KEY")
@@ -195,7 +192,8 @@ def get_relay_command_2():
 def get_status_2():
     global hall_state_2, last_update_time_2
 
-    if session.get("role") != "admin":
+    role = session.get("role")
+    if role not in ["admin", "gate3"]:
         return "Nieautoryzowany", 401
 
     if time.time() - last_update_time_2 > 60:
@@ -206,7 +204,8 @@ def get_status_2():
 
 @app.route('/click_2')
 def register_click_2():
-    if session.get("role") != "admin":
+    role = session.get("role")
+    if role not in ["admin", "gate3"]:
         return "Nieautoryzowany", 401
 
     global click_2, click_time_2
@@ -285,72 +284,6 @@ def register_click_3():
     click_3 = 1
     click_time_3 = current_time
     return "Kliknięcie bramy 3 zarejestrowane."
-
-
-# all gates
-@app.route('/all_open')
-def all_open():
-    if session.get("role") != "admin":
-        return "Nieautoryzowany", 401
-
-    global click, click_time, click_2, click_time_2
-    global last_all_action_time
-
-    now = time.time()
-    if now - last_all_action_time < ALL_ACTION_COOLDOWN:
-        remaining = int(ALL_ACTION_COOLDOWN - (now - last_all_action_time))
-        return f"Poczekaj {remaining}s przed kolejną akcją", 429
-
-    actions = []
-
-    if hall_state == "closed":
-        click = 1
-        click_time = now
-        actions.append("brama1")
-
-    if hall_state_2 == "closed":
-        click_2 = 1
-        click_time_2 = now
-        actions.append("brama2")
-
-    if not actions:
-        return "Wszystkie bramy są już otwarte"
-
-    last_all_action_time = now
-    return f"Otwieranie: {', '.join(actions)}"
-
-
-@app.route('/all_close')
-def all_close():
-    if session.get("role") != "admin":
-        return "Nieautoryzowany", 401
-
-    global click, click_time, click_2, click_time_2
-    global last_all_action_time
-
-    now = time.time()
-    if now - last_all_action_time < ALL_ACTION_COOLDOWN:
-        remaining = int(ALL_ACTION_COOLDOWN - (now - last_all_action_time))
-        return f"Poczekaj {remaining}s przed kolejną akcją", 429
-
-    actions = []
-
-    if hall_state == "open":
-        click = 1
-        click_time = now
-        actions.append("brama1")
-
-    if hall_state_2 == "open":
-        click_2 = 1
-        click_time_2 = now
-        actions.append("brama2")
-
-    if not actions:
-        return "Wszystkie bramy są już zamknięte"
-
-    last_all_action_time = now
-    return f"Zamykanie: {', '.join(actions)}"
-
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 8080))
