@@ -43,8 +43,9 @@ def require_esp_key():
 # gate 1
 @app.route('/')
 def index():
-    if session.get("role") != "admin":
-        return redirect(url_for("login"))
+    role = session.get("role")
+    if role not in ["admin", "gate3"]:
+        return "Nieautoryzowany", 401
     return open('index.html').read()
 
 
